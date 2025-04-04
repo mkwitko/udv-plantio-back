@@ -1,22 +1,20 @@
 import { hash } from "bcryptjs";
 import { UserModel } from "../../models/user-model";
-import { CompanyModel } from "../../models/company-model";
 
 export async function initUserService() {
-  const hashedPassword = await hash("86210262015", 8);
+  const hashedPassword = await hash("xhu7voh8", 10);
   const userModel = new UserModel();
-  const companyModel = new CompanyModel();
-  const company = await companyModel.create({
-    name: "ProsperApps",
-    cnpj: "12345678901234",
-  });
+
   const user = await userModel.create({
-    name: "SUPER ADMIN",
+    name: "Maurício de Oliveira Kwitko",
     cpf: "86210262015",
-    birthday: "11/12/1995",
     password: hashedPassword,
-    companies: [company.id],
-    permissions: ["SUPERADMIN"],
+    birthday: "11/12/1995",
+    email: "mauriciokwt@gmail.com",
+    phone: "+5551994682002",
+    hierarchy: "CI",
+    isAdmin: true,
+    isSuperAdmin: true,
   });
   return { user };
 }

@@ -2,12 +2,9 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { findUserByIdService } from "../../services/user/find-user-by-id-service";
-import { unitItem } from "@/@types/zod/unit/unit";
-import { groupItem } from "@/@types/zod/group/group";
-import { companyItem } from "@/@types/zod/companies/companies";
-import { userItem } from "@/@types/zod/user/user";
 import { clearAuth } from "../../services/authentication/clear-auth-service";
 import { authenticationMiddleware } from "@/middlewares/authentication-middleware";
+import { userResponse } from "./create-user";
 
 export async function findMe(app: FastifyInstance) {
   app
@@ -22,12 +19,7 @@ export async function findMe(app: FastifyInstance) {
           description: "Find Me",
           operationId: "findMe",
           response: {
-            201: z.object({
-              ...userItem.shape,
-              companies: z.array(companyItem),
-              group: z.array(groupItem),
-              unit: z.array(unitItem),
-            }),
+            201: userResponse,
             409: z.object({
               message: z.string(),
             }),
@@ -35,7 +27,7 @@ export async function findMe(app: FastifyInstance) {
         },
       },
       async (request, response) => {
-        const id = request.user.sub.id;
+        const id = request.user.userId;
         const { user } = await findUserByIdService({ id });
 
         if (response.statusCode === 409) {

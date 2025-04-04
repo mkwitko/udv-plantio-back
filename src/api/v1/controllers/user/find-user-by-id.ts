@@ -3,6 +3,7 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { findUserByIdService } from "../../services/user/find-user-by-id-service";
 import { authenticationMiddleware } from "@/middlewares/authentication-middleware";
+import { userResponse } from "./create-user";
 
 export async function findUserById(app: FastifyInstance) {
   app
@@ -20,24 +21,7 @@ export async function findUserById(app: FastifyInstance) {
             id: z.string().cuid(),
           }),
           response: {
-            201: z.object({
-              id: z.string(),
-              name: z.string(),
-
-              avatarUrl: z.string().nullable(),
-              cpf: z.string(),
-              createdAt: z.date(),
-              updatedAt: z.date(),
-              deletedAt: z.date().nullable(),
-              isDeleted: z.boolean(),
-              birthday: z.string(),
-              permissions: z.array(z.string()),
-              companies: z.array(
-                z.object({ id: z.string(), name: z.string() })
-              ),
-              group: z.array(z.object({ id: z.string(), name: z.string() })),
-              unit: z.array(z.object({ id: z.string(), name: z.string() })),
-            }),
+            201: userResponse,
           },
         },
       },

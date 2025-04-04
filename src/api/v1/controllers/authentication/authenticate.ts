@@ -14,7 +14,7 @@ export async function authenticateUser(app: FastifyInstance) {
         operationId: "signIn",
         description: "Authenticate user",
         body: z.object({
-          cpf: z.string(),
+          email: z.string(),
           password: z.string().min(6),
         }),
         response: {
@@ -26,22 +26,20 @@ export async function authenticateUser(app: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const { cpf, password } = request.body;
+      const { email, password } = request.body;
 
-      const { user } = await authenticationService({ cpf, password });
+      const { user } = await authenticationService({ email, password });
 
       const accessToken = app.jwt.sign(
         {
-          sub: user,
-          kind: user.permissions.includes("SUPERADMIN"),
+          userId: user.id,
         },
         { expiresIn: "1d" }
       );
 
       const refreshToken = app.jwt.sign(
         {
-          sub: user,
-          kind: user.permissions.includes("SUPERADMIN"),
+          userId: user.id,
         },
         { expiresIn: "30d" }
       );

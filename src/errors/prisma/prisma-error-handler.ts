@@ -2,63 +2,13 @@ import { Prisma } from "@prisma/client";
 
 // Model name translations
 const modelTranslations: Record<string, string> = {
-  Ambulance: "Ambulância",
-  AmbulanceDocument: "Documento da Ambulância",
-  Base: "Base",
-  Chat: "Chat",
-  Company: "Empresa",
-  Group: "Grupo",
-  Message: "Mensagem",
-  Unit: "Unidade",
   User: "Usuário",
 };
 
 // Field name translations (expanded from previous version)
 const fieldTranslations: Record<string, string> = {
-  // Common fields
-  id: "identificador",
-  createdAt: "data de criação",
-  updatedAt: "data de atualização",
-  deletedAt: "data de exclusão",
-  isDeleted: "excluído",
-  name: "nome",
-  companyId: "empresa",
-  groupId: "grupo",
-  unitId: "unidade",
-  cellphone: "telefone",
-
-  // Ambulance specific
-  plateNumber: "placa",
-  linkingCode: "código de vínculo",
-  chatId: "chat",
-  baseId: "base",
-  currentBaseId: "base atual",
-  destinationBaseId: "base de destino",
-  latitude: "latitude",
-  longitude: "longitude",
-  enterDate: "data de entrada",
-  leaveDate: "data de saída",
-  avatarUrl: "foto de perfil",
-  status: "status",
-  subStatus: "sub-status",
-
-  // AmbulanceDocument specific
-  ambulanceId: "ambulância",
-  title: "título",
-  type: "tipo",
-  content: "conteúdo",
-  validUntil: "válido até",
-
-  // User specific
-  cpf: "CPF",
-  password: "senha",
-  birthday: "data de nascimento",
-  permissions: "permissões",
-
   // Message specific
   userId: "usuário",
-  durationInSeconds: "duração em segundos",
-  file: "arquivo",
   username: "nome de usuário",
 };
 

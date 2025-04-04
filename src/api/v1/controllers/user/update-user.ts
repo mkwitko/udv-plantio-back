@@ -3,6 +3,7 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { updateUserService } from "../../services/user/update-user-service";
 import { authenticationMiddleware } from "@/middlewares/authentication-middleware";
+import { userResponse } from "./create-user";
 
 export async function updateUser(app: FastifyInstance) {
   app
@@ -18,24 +19,7 @@ export async function updateUser(app: FastifyInstance) {
           operationId: "updateUser",
           body: updateUserRequestScheam,
           response: {
-            201: z.object({
-              id: z.string(),
-              name: z.string(),
-              cpf: z.string(),
-
-              avatarUrl: z.string().nullable(),
-              createdAt: z.date(),
-              updatedAt: z.date(),
-              deletedAt: z.date().nullable(),
-              isDeleted: z.boolean(),
-              birthday: z.string(),
-              permissions: z.array(z.string()),
-              companies: z.array(
-                z.object({ id: z.string(), name: z.string() })
-              ),
-              group: z.array(z.object({ id: z.string(), name: z.string() })),
-              unit: z.array(z.object({ id: z.string(), name: z.string() })),
-            }),
+            201: userResponse,
           },
         },
       },
@@ -48,11 +32,14 @@ export async function updateUser(app: FastifyInstance) {
 
 export const updateUserRequestScheam = z.object({
   id: z.string(),
-  name: z.string().optional(),
-  cpf: z.string().optional(),
-  companies: z.array(z.string().nullable()).optional(), // Optional field
-  group: z.array(z.string().nullable()).optional(), // Optional field
-  unit: z.array(z.string().nullable()).optional(), // Optional field
-  permissions: z.array(z.string()), // Optional field
+  name: z.string(),
+  cpf: z.string(),
+  password: z.string(),
+  birthday: z.string().optional(),
   avatarUrl: z.string().optional(),
+  email: z.string(),
+  phone: z.string().optional(),
+  hierarchy: z.string().optional(),
+  isAdmin: z.boolean().optional(),
+  isSuperAdmin: z.boolean().optional(),
 });

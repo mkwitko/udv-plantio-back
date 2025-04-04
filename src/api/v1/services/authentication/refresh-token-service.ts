@@ -11,21 +11,19 @@ export async function refreshTokenService(refreshToken: string): Promise<{
 }> {
   const decode = app.jwt.decode<FastifyJWT["payload"]>(refreshToken);
 
-  if (!decode || !decode.sub) {
+  if (!decode || !decode.userId) {
     throw new UnauthorizedError("Token inválido");
   }
 
-  const { user } = await findUserByIdService({ id: decode.sub.id || "" });
+  const { user } = await findUserByIdService({ id: decode.userId || "" });
 
   const accessToken = app.jwt.sign({
-    sub: user,
-    kind: user.permissions.includes("SUPERADMIN"),
+    userId: user.id,
   });
 
   const newRefreshToken = app.jwt.sign(
     {
-      sub: user,
-      kind: user.permissions.includes("SUPERADMIN"),
+      userId: user.id,
     },
     { expiresIn: "30d" }
   );

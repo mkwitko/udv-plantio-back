@@ -56,7 +56,7 @@ app.register(fastifyCors, {
 app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: "ProsperChat",
+      title: "Udv Plantio",
       version: "1.0.0",
     },
     components: {

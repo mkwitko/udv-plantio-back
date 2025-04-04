@@ -3,16 +3,16 @@ import { compare } from "bcryptjs";
 import { UserModel } from "../../models/user-model";
 
 interface AuthenticationParams {
-  cpf: string;
+  email: string;
   password: string;
 }
 
 export async function authenticationService({
-  cpf,
+  email,
   password,
 }: AuthenticationParams) {
   const userModel = new UserModel();
-  const user = await userModel.findByCpf(cpf, false);
+  const user = await userModel.findByEmail(email);
   const doesPasswordMatch = await compare(password, user.password);
 
   if (doesPasswordMatch === false) {

@@ -11,8 +11,6 @@ const envSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string(),
   AWS_BUCKET_NAME: z.string(),
   AWS_SECRET_ACCESS_KEY: z.string(),
-  AWS_SESSION_TOKEN: z.string(),
-  AWS_JURISDICTION: z.string(),
   AWS_ACCOUNT_ID: z.string(),
   AWS_PUBLIC_SUBDOMAIN: z.string().url(),
 });

@@ -7,300 +7,89 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Ambulance {
-  id          String    @id @default(cuid())
-  companyId   String
-  plateNumber String    @unique
-  linkingCode String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
-  chatId      String
-  groupId     String
-  unitId      String
-  name        String
-
-  observation String?
-
-  baseId String?
-  base   Base?   @relation(name: "AmbulanceBase", fields: [baseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  currentBaseId String?
-  currentBase   Base?   @relation(name: "AmbulanceCurrentBase", fields: [currentBaseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  destinationBaseId String?
-  destinationBase   Base?   @relation(name: "AmbulanceDestinationBase", fields: [destinationBaseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  respondedToDestination Boolean? @default(false)
-
-  latitude  String?
-  longitude String?
-
-  enterDate String?
-  leaveDate String?
-
-  avatarUrl           String?
-  status              String?               @default("FA")
-  subStatus           String?               @default("Final de Turno")
-  company             Company               @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  group               Group                 @relation(fields: [groupId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  unit                Unit                  @relation(fields: [unitId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  chat                Chat[]
-  ambulanceDocument   AmbulanceDocument[]
-  destinationCommands DestinationCommands[]
-  Services            Services[]
-
-  @@map("ambulances")
-}
-
-model AmbulanceDocument {
-  id          String    @id @default(cuid())
-  ambulanceId String
-  title       String
-  type        String
-  content     String
-  exclude     Boolean?  @default(false)
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
-  validUntil  DateTime?
-
-  @@map("ambulance_documents")
-}
-
-model Base {
-  id        String    @id @default(cuid())
-  name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean   @default(false)
-
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  groupId String
-  group   Group  @relation(fields: [groupId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  unitId String
-  unit   Unit   @relation(fields: [unitId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  latitude                 Float
-  longitude                Float
-  Ambulance                Ambulance[]           @relation("AmbulanceBase")
-  AmbulanceCurrentBase     Ambulance[]           @relation("AmbulanceCurrentBase")
-  AmbulanceDestinationBase Ambulance[]           @relation("AmbulanceDestinationBase")
-  DestinationCommands      DestinationCommands[]
-
-  @@map("bases")
-}
-
-model Chat {
-  id          String    @id @default(cuid())
-  companyId   String
-  ambulanceId String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
-  groupId     String
-  unitId      String
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  company     Company   @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  group       Group     @relation(fields: [groupId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  unit        Unit      @relation(fields: [unitId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  messages    Message[]
-
-  @@map("chats")
-}
-
-model Company {
-  id        String      @id @default(cuid())
-  name      String
-  cnpj      String      @unique
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean     @default(false)
-  cellphone String[]
-  ambulance Ambulance[]
-  chat      Chat[]
-  group     Group[]
-  unit      Unit[]
-  users     User[]      @relation("CompanyToUser")
-  Base      Base[]
-  Services  Services[]
-
-  ambulancesHired Int? @default(0)
-
-  companyModules CompanyModules[]
-
-  @@map("companies")
-}
-
-model DestinationCommands {
-  id                String @id @default(cuid())
-  destinationBaseId String?
-  destination       Base?   @relation(fields: [destinationBaseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  ambulanceId String
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  attended   Boolean?  @default(false)
-  attendedAt DateTime? @default(now())
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  latitude  Float?
-  longitude Float?
-  address  String?
-
-  @@map("destination_commands")
-}
-
-model Group {
-  id        String      @id @default(cuid())
-  companyId String
-  name      String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean     @default(false)
-  cellphone String[]
-  ambulance Ambulance[]
-  chat      Chat[]
-  company   Company     @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  unit      Unit[]
-  user      User[]      @relation("GroupToUser")
-  Base      Base[]
-  Services  Services[]
-
-  @@map("groups")
-}
-
-model Message {
-  id                String    @id @default(cuid())
-  chatId            String
-  userId            String
-  content           String
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  deletedAt         DateTime?
-  isDeleted         Boolean   @default(false)
-  type              String
-  durationInSeconds Int?
-  file              String?
-  read              Boolean   @default(false)
-  username          String
-  chat              Chat      @relation(fields: [chatId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  user              User      @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
-  @@map("messages")
-}
-
-model Services {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean   @default(false)
-
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onUpdate: Cascade)
-
-  groupId String
-  group   Group  @relation(fields: [groupId], references: [id], onUpdate: Cascade)
-
-  unitId String
-  unit   Unit   @relation(fields: [unitId], references: [id], onUpdate: Cascade)
-
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onUpdate: Cascade)
-  ambulanceId String
-
-  latitude  Float
-  longitude Float
-
-  cep      String
-  number   String
-  street   String
-  district String
-  city     String
-  state    String
-  country  String
-  complement String?
-
-  @@map("services")
-}
-
-model Unit {
-  id        String      @id @default(cuid())
-  companyId String
-  groupId   String
-  name      String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean     @default(false)
-  cellphone String[]
-  ambulance Ambulance[]
-  chat      Chat[]
-  company   Company     @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  group     Group       @relation(fields: [groupId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  user      User[]      @relation("UnitToUser")
-  Base      Base[]
-  Services  Services[]
-
-  @@map("units")
-}
-
 model User {
-  id        String    @id @default(cuid())
-  name      String
-  cpf       String    @unique
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean   @default(false)
-  birthday  String
-  avatarUrl String?
+  id           String    @id @default(cuid())
+  name         String
+  cpf          String?   @unique
+  password     String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+  isDeleted    Boolean   @default(false)
+  birthday     String?
+  avatarUrl    String?
+  email        String?   @unique
+  phone        String?
+  hierarchy    String?
+  isActive     Boolean   @default(true)
+  isVerified   Boolean   @default(false)
+  isAdmin      Boolean   @default(false)
+  isSuperAdmin Boolean   @default(false)
 
-  permissions String[]
-  messages    Message[]
-  companies   Company[] @relation("CompanyToUser")
-  group       Group[]   @relation("GroupToUser")
-  unit        Unit[]    @relation("UnitToUser")
+  center   Center? @relation(fields: [centerId], references: [id])
+  centerId String?
 
   @@map("users")
 }
 
-model Modules {
+model Center {
   id        String    @id @default(cuid())
   name      String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   isDeleted Boolean   @default(false)
+  user      User[]
 
-  companyModules CompanyModules[]
-
-  @@map("modules")
+  @@map("centers")
 }
 
-model CompanyModules {
-  id         String   @id @default(cuid())
-  companyId  String
-  modulesId  String
-  assignedAt DateTime @default(now())
+model Plants {
+  id        String      @id @default(cuid())
+  name      String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean     @default(false)
+  type      PlantsType? @relation(fields: [typeId], references: [id])
+  typeId    String?
 
-  company    Company  @relation(fields: [companyId], references: [id])
-  modules    Modules  @relation(fields: [modulesId], references: [id])
+  @@map("plants")
+}
 
-  @@unique([companyId, modulesId])
-  @@map("company_modules")
+model PlantsType {
+  id        String    @id @default(cuid())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean   @default(false)
+  Plants    Plants[]
+}
+
+model PlantationCalendarDates {
+  id                           String                      @id @default(cuid())
+  name                         String
+  type                         String
+  date                         DateTime
+  tooltip                      String?
+  createdAt                    DateTime                    @default(now())
+  updatedAt                    DateTime                    @updatedAt
+  deletedAt                    DateTime?
+  isDeleted                    Boolean                     @default(false)
+  plantationCalendarCategory   PlantationCalendarCategory? @relation(fields: [plantationCalendarCategoryId], references: [id])
+  plantationCalendarCategoryId String?
+}
+
+model PlantationCalendarCategory {
+  id        String    @id @default(cuid())
+  name      String
+  label     String
+  tooltip   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean   @default(false)
+
+  plantationCalendarDates PlantationCalendarDates[]
 }
