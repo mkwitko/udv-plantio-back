@@ -35,24 +35,53 @@ model User {
 model Center {
   id        String    @id @default(cuid())
   name      String
+  region    String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   isDeleted Boolean   @default(false)
   user      User[]
+  Plants    Plants[]
 
   @@map("centers")
 }
 
 model Plants {
-  id        String      @id @default(cuid())
-  name      String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  observation String?
+
+  image                String?
+  origin               String?
+  identificationNumber String?
+  isIdentified         Boolean @default(false)
+
+  plantationDate DateTime?
+  pictureDate    DateTime?
+
+  lastWatering      DateTime?
+  lastFertilization DateTime?
+  lastPestControl   DateTime?
+  lastPruning       DateTime?
+  lastHarvest       DateTime?
+  lastWeeding       DateTime?
+  lastSoilAnalysis  DateTime?
+
+  latitude  Float?
+  longitude Float?
+  address   String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  isDeleted Boolean     @default(false)
-  type      PlantsType? @relation(fields: [typeId], references: [id])
-  typeId    String?
+  isDeleted Boolean   @default(false)
+
+  center   Center? @relation(fields: [centerId], references: [id])
+  centerId String?
+
+  type   PlantsType? @relation(fields: [typeId], references: [id])
+  typeId String?
 
   @@map("plants")
 }
@@ -68,28 +97,39 @@ model PlantsType {
 }
 
 model PlantationCalendarDates {
-  id                           String                      @id @default(cuid())
-  name                         String
-  type                         String
-  date                         DateTime
-  tooltip                      String?
-  createdAt                    DateTime                    @default(now())
-  updatedAt                    DateTime                    @updatedAt
-  deletedAt                    DateTime?
-  isDeleted                    Boolean                     @default(false)
-  plantationCalendarCategory   PlantationCalendarCategory? @relation(fields: [plantationCalendarCategoryId], references: [id])
-  plantationCalendarCategoryId String?
+  id                         String    @id @default(cuid())
+  name                       String
+  type                       String
+  date                       DateTime
+  tooltip                    String?
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+  deletedAt                  DateTime?
+  isDeleted                  Boolean   @default(false)
+  plantationCalendarCategory String
 }
 
-model PlantationCalendarCategory {
-  id        String    @id @default(cuid())
-  name      String
-  label     String
-  tooltip   String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+model Faq {
+  id String @id @default(cuid())
+  category String
+  type String
+  question String
+  answer String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   deletedAt DateTime?
-  isDeleted Boolean   @default(false)
+  isDeleted Boolean @default(false)
+  isActive Boolean @default(true)
+}
 
-  plantationCalendarDates PlantationCalendarDates[]
+model News {
+  id String @id @default(cuid())
+  title String
+  description String
+  image String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean @default(false)
+  isActive Boolean @default(true)
 }

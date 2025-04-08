@@ -25,6 +25,12 @@ export async function getPressignedUrl(app: FastifyInstance) {
               fileName: z.string().regex(/\.(pdf)$/),
               fileType: z.string().regex(/(application\/pdf)/),
             }),
+            z.object({
+              folder: z.literal("news-image"),
+              fileSize: z.number().max(5 * 1024 * 1024), // 5MB
+              fileName: z.string().regex(/\.(jpg|jpeg|png)$/),
+              fileType: z.string().regex(/(image\/jpeg|image\/png)/),
+            }),
           ]),
           response: {
             201: z.object({

@@ -9,7 +9,7 @@ export const plantationCalendarDateResponse = z.object({
   type: z.string(),
   date: z.date(),
   tooltip: z.string().optional().nullable(),
-  plantationCalendarCategoryId: z.string().nullable(),
+  plantationCalendarCategory: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable(),
@@ -44,5 +44,5 @@ export const createPlantationCalendarDateRequestScheam = z.object({
   type: z.string(),
   date: z.string(),
   tooltip: z.string().optional(),
-  plantationCalendarCategoryId: z.string(),
+  plantationCalendarCategory: z.string(),
 });

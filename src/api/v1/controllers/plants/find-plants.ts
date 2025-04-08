@@ -14,16 +14,17 @@ export async function findPlants(app: FastifyInstance) {
       {
         schema: {
           tags: ["Plants"],
-          summary: "Find All Plantss",
-          description: "Find all Plantss",
-          operationId: "findAllPlantss",
+          summary: "Find All Plants",
+          description: "Find all Plants",
+          operationId: "findAllPlants",
           response: {
             201: z.array(plantResponse),
           },
         },
       },
-      async (_, response) => {
-        const { plants } = await findPlantsService();
+      async (request, response) => {
+        const { userId } = request.user;
+        const { plants } = await findPlantsService(userId);
         return response.status(201).send(plants);
       }
     );

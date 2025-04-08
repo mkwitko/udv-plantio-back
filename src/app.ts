@@ -47,7 +47,7 @@ app.register(fastifyCookie);
 app.register(fastifyCors, {
   origin:
     env.ENVIRONMENT === "production"
-      ? "https://connect.prosperapps.com.br"
+      ? "https://udv-plantio-rfcqip7pg-mkwitkos-projects.vercel.app/"
       : "http://localhost:5173", // Change this to your front-end origin
   credentials: true, // This allows cookies to be sent
 });

@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "."
-          target: "/root/projects/connect-back"
+          target: "/root/projects/udv-plantio-back"
 
       - name: Restart Node.js app
         uses: appleboy/ssh-action@master
@@ -40,10 +40,10 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/projects/connect-back
+            cd /root/projects/udv-plantio-back
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             npx prisma generate
-            pm2 flush 5
-            pm2 restart 5
+            pm2 flush 3
+            pm2 restart 3
             

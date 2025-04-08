@@ -14,9 +14,9 @@ export async function findPlantationCalendarDatess(app: FastifyInstance) {
       {
         schema: {
           tags: ["PlantationCalendarDate"],
-          summary: "Find All PlantationCalendarDatess",
-          description: "Find all PlantationCalendarDatess",
-          operationId: "findAllPlantationCalendarDatess",
+          summary: "Find All PlantationCalendarDates",
+          description: "Find all PlantationCalendarDates",
+          operationId: "findAllPlantationCalendarDates",
           response: {
             201: z.array(plantationCalendarDateResponse),
           },

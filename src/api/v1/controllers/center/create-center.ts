@@ -6,6 +6,7 @@ import { createCenterService } from "../../services/center/create-center-service
 export const centerResponse = z.object({
   id: z.string(),
   name: z.string(),
+  region: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable(),
@@ -36,4 +37,5 @@ export async function createCenter(app: FastifyInstance) {
 
 export const createCenterRequestScheam = z.object({
   name: z.string(),
+  region: z.string(),
 });

@@ -37,5 +37,5 @@ export const updatePlantationCalendarDatesRequestScheam = z.object({
   type: z.string(),
   date: z.string(),
   tooltip: z.string().optional(),
-  plantationCalendarCategoryId: z.string(),
+  plantationCalendarCategory: z.string(),
 });

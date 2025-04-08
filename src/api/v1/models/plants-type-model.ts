@@ -1,8 +1,10 @@
 import { prisma } from "prisma/db";
 import type z from "zod";
+import type { createPlantsTypeRequestScheam } from "../controllers/plants-type/create-plants-type";
+import type { updatePlantTypeRequestScheam } from "../controllers/plants-type/update-plants-type";
 
 export class PlantsTypeModel {
-  async create(data: z.infer<typeof createPlantsTypeRequestSchema>) {
+  async create(data: z.infer<typeof createPlantsTypeRequestScheam>) {
     const plantsType = await prisma.plantsType.create({
       data,
     });
@@ -30,7 +32,7 @@ export class PlantsTypeModel {
     return plantsTypes;
   }
 
-  async update(data: z.infer<typeof updatePlantsTypeRequestSchema>) {
+  async update(data: z.infer<typeof updatePlantTypeRequestScheam>) {
     const plantsType = await prisma.plantsType.update({
       data,
       where: {
@@ -41,6 +43,7 @@ export class PlantsTypeModel {
   }
 
   async exclude(id: string, soft = false) {
+    console.log(id, soft);
     if (soft) {
       const plantsType = await prisma.plantsType.update({
         data: {

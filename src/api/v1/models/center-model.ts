@@ -1,8 +1,10 @@
 import { prisma } from "prisma/db";
 import type z from "zod";
+import type { createCenterRequestScheam } from "../controllers/center/create-center";
+import type { updateCenterRequestScheam } from "../controllers/center/update-center";
 
 export class CenterModel {
-  async create(data: z.infer<typeof createCenterRequestSchema>) {
+  async create(data: z.infer<typeof createCenterRequestScheam>) {
     const center = await prisma.center.create({
       data,
     });
@@ -30,7 +32,7 @@ export class CenterModel {
     return centers;
   }
 
-  async update(data: z.infer<typeof updateCenterRequestSchema>) {
+  async update(data: z.infer<typeof updateCenterRequestScheam>) {
     const center = await prisma.center.update({
       data,
       where: {

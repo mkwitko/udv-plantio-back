@@ -1,10 +1,29 @@
 import { prisma } from "prisma/db";
 import type z from "zod";
+import type { createPlantRequestSchema } from "../controllers/plants/create-plants";
+import type { updatePlantRequestScheam } from "../controllers/plants/update-plants";
+
+const include = {
+  type: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  center: {
+    select: {
+      id: true,
+      name: true,
+      region: true,
+    },
+  },
+};
 
 export class PlantsModel {
-  async create(data: z.infer<typeof createPlantsRequestSchema>) {
+  async create(data: z.infer<typeof createPlantRequestSchema>) {
     const plant = await prisma.plants.create({
       data,
+      include,
     });
     return plant;
   }
@@ -15,9 +34,22 @@ export class PlantsModel {
         id,
         isDeleted: false,
       },
+      include,
     });
 
     return plant;
+  }
+
+  async findByCenter(id: string) {
+    const plants = await prisma.plants.findMany({
+      where: {
+        centerId: id,
+        isDeleted: false,
+      },
+      include,
+    });
+
+    return plants;
   }
 
   async findAll() {
@@ -25,20 +57,19 @@ export class PlantsModel {
       where: {
         isDeleted: false,
       },
-      include: {
-        type: true,
-      },
+      include,
     });
 
     return plants;
   }
 
-  async update(data: z.infer<typeof updatePlantsRequestSchema>) {
+  async update(data: z.infer<typeof updatePlantRequestScheam>) {
     const plant = await prisma.plants.update({
       data,
       where: {
         id: data.id as string,
       },
+      include,
     });
     return plant;
   }
@@ -53,6 +84,7 @@ export class PlantsModel {
         where: {
           id,
         },
+        include,
       });
       return plant;
     }

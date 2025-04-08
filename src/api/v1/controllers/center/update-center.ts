@@ -33,4 +33,5 @@ export async function updateCenter(app: FastifyInstance) {
 export const updateCenterRequestScheam = z.object({
   id: z.string(),
   name: z.string(),
+  region: z.string(),
 });

@@ -1,9 +1,11 @@
 import { prisma } from "prisma/db";
 import type z from "zod";
+import type { createPlantationCalendarDateRequestScheam } from "../controllers/plantation-calendar-date/create-plantation-calendar-date";
+import type { updatePlantationCalendarDatesRequestScheam } from "../controllers/plantation-calendar-date/update-plantation-calendar-date";
 
 export class PlantationCalendarDatesModel {
   async create(
-    data: z.infer<typeof createPlantationCalendarDatesRequestSchema>
+    data: z.infer<typeof createPlantationCalendarDateRequestScheam>
   ) {
     const plantationCalendarDate = await prisma.plantationCalendarDates.create({
       data,
@@ -18,9 +20,6 @@ export class PlantationCalendarDatesModel {
           id,
           isDeleted: false,
         },
-        include: {
-          plantationCalendarCategory: true,
-        },
       });
 
     return plantationCalendarDate;
@@ -32,16 +31,13 @@ export class PlantationCalendarDatesModel {
         where: {
           isDeleted: false,
         },
-        include: {
-          plantationCalendarCategory: true,
-        },
       });
 
     return plantationCalendarDates;
   }
 
   async update(
-    data: z.infer<typeof updatePlantationCalendarDatesRequestSchema>
+    data: z.infer<typeof updatePlantationCalendarDatesRequestScheam>
   ) {
     const plantationCalendarDate = await prisma.plantationCalendarDates.update({
       data,

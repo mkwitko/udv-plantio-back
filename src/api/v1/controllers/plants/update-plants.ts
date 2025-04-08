@@ -33,5 +33,29 @@ export async function updatePlant(app: FastifyInstance) {
 export const updatePlantRequestScheam = z.object({
   id: z.string(),
   name: z.string(),
-  typeId: z.string(),
+  description: z.string().optional(),
+  observation: z.string().optional(),
+
+  image: z.string().optional(),
+  origin: z.string().optional(),
+  identificationNumber: z.string().optional(),
+  isIdentified: z.boolean().optional(),
+
+  plantationDate: z.date().optional(),
+  pictureDate: z.date().optional(),
+
+  lastWatering: z.date().optional(),
+  lastFertilization: z.date().optional(),
+  lastPestControl: z.date().optional(),
+  lastPruning: z.date().optional(),
+  lastHarvest: z.date().optional(),
+  lastWeeding: z.date().optional(),
+  lastSoilAnalysis: z.date().optional(),
+
+  latitude: z.number(),
+  longitude: z.number(),
+  address: z.string().optional(),
+
+  typeId: z.string().nullable(),
+  centerId: z.string().nullable(),
 });
