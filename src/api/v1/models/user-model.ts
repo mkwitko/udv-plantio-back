@@ -1,11 +1,11 @@
-import { prisma } from "prisma/db";
 import type z from "zod";
 import type { createUserRequestScheam } from "../controllers/user/create-user";
 import type { updateUserRequestScheam } from "../controllers/user/update-user";
+import { prisma } from "@/lib/prisma/prisma";
 
 export class UserModel {
   async create(
-    data: z.infer<typeof createUserRequestScheam> & { password: string }
+    data: z.infer<typeof createUserRequestScheam> & { password: string },
   ) {
     const user = await prisma.user.create({
       data,
@@ -23,7 +23,7 @@ export class UserModel {
   }
 
   async findById<
-    T extends boolean = true // Default to true for omitPassword
+    T extends boolean = true, // Default to true for omitPassword
   >(id: string, omitPassword: T = true as T) {
     const user = await prisma.user.findUniqueOrThrow({
       where: {

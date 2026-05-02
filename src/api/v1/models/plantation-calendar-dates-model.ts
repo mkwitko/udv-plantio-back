@@ -1,11 +1,11 @@
-import { prisma } from "prisma/db";
+import { prisma } from "@/lib/prisma/prisma";
 import type z from "zod";
 import type { createPlantationCalendarDateRequestScheam } from "../controllers/plantation-calendar-date/create-plantation-calendar-date";
 import type { updatePlantationCalendarDatesRequestScheam } from "../controllers/plantation-calendar-date/update-plantation-calendar-date";
 
 export class PlantationCalendarDatesModel {
   async create(
-    data: z.infer<typeof createPlantationCalendarDateRequestScheam>
+    data: z.infer<typeof createPlantationCalendarDateRequestScheam>,
   ) {
     const plantationCalendarDate = await prisma.plantationCalendarDates.create({
       data,
@@ -37,7 +37,7 @@ export class PlantationCalendarDatesModel {
   }
 
   async update(
-    data: z.infer<typeof updatePlantationCalendarDatesRequestScheam>
+    data: z.infer<typeof updatePlantationCalendarDatesRequestScheam>,
   ) {
     const plantationCalendarDate = await prisma.plantationCalendarDates.update({
       data,

@@ -1,4 +1,4 @@
-import { prisma } from "prisma/db";
+import { prisma } from "@/lib/prisma/prisma";
 import type z from "zod";
 import type { updateNewsRequestSchema } from "../controllers/news/update-news";
 import type { createNewsRequestSchema } from "../controllers/news/create-news";

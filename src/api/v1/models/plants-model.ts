@@ -1,4 +1,4 @@
-import { prisma } from "prisma/db";
+import { prisma } from "@/lib/prisma/prisma";
 import type z from "zod";
 import type { createPlantRequestSchema } from "../controllers/plants/create-plants";
 import type { updatePlantRequestScheam } from "../controllers/plants/update-plants";

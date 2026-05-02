@@ -1,4 +1,4 @@
-import { prisma } from "prisma/db";
+import { prisma } from "@/lib/prisma/prisma";
 import type z from "zod";
 import type { createfaqRequestSchema } from "../controllers/faq/create-faq";
 import type { updateFaqRequestSchema } from "../controllers/faq/update-faq";

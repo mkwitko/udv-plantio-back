@@ -1,4 +1,4 @@
-import { prisma } from "prisma/db";
+import { prisma } from "@/lib/prisma/prisma";
 import type z from "zod";
 import type { createCenterRequestScheam } from "../controllers/center/create-center";
 import type { updateCenterRequestScheam } from "../controllers/center/update-center";
