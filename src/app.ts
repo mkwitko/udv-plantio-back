@@ -73,6 +73,11 @@ app.register(fastifySwagger, {
 });
 app.register(fastifyWebsocket);
 
+// Health check (used by Docker/nginx/deploy.sh)
+app.get("/health", async () => {
+  return { status: "ok" };
+});
+
 // HTTP Routes
 Routing();
 

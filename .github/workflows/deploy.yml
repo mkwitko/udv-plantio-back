@@ -1,4 +1,4 @@
-name: Deploy Node.js App
+name: Deploy Production
 
 on:
   push:
@@ -10,40 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Build project
-        run: yarn build
-
       - name: Deploy to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "."
-          target: "/root/projects/udv-plantio-back"
+        uses: appleboy/ssh-action@v1.2.0
 
-      - name: Restart Node.js app
-        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+
           script: |
-            cd /root/projects/udv-plantio-back
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            npx prisma generate
-            pm2 startOrReload ecosystem.config.js
-            pm2 save
+            cd /opt/udv-plantio-back
+            chmod +x deploy.sh
+            ./deploy.sh
