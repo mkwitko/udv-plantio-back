@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "."
-          target: "/root/projects/udv-plantio-back"
+          target: "/opt/udv-plantio-back"
 
       - name: Restart Node.js app
         uses: appleboy/ssh-action@master
