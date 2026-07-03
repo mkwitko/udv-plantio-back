@@ -1,30 +1,17 @@
-import type z from "zod";
-import type { createUserRequestScheam } from "../controllers/user/create-user";
-import type { updateUserRequestScheam } from "../controllers/user/update-user";
 import { prisma } from "@/lib/prisma/prisma";
 
-export class UserModel {
-  async create(
-    data: z.infer<typeof createUserRequestScheam> & { password: string },
-  ) {
-    const user = await prisma.user.create({
-      data,
-      include: {
-        center: {
-          select: {
-            id: true,
-            name: true,
-            region: true,
-          },
-        },
-      },
-    });
-    return user;
-  }
+interface CognitoUserData {
+  email: string;
+  nome: string;
+  grau: string | null;
+  cargos: string | null;
+  cargoNome: string | null;
+  cargoCodigo: string | null;
+}
 
-  async findById<
-    T extends boolean = true, // Default to true for omitPassword
-  >(id: string, omitPassword: T = true as T) {
+export class UserModel {
+  // Busca usuário por ID (sem senha), com center. `cargos` vira array.
+  async findById(id: string) {
     const user = await prisma.user.findUniqueOrThrow({
       where: {
         id,
@@ -41,27 +28,11 @@ export class UserModel {
       },
     });
 
-    if (omitPassword) {
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword; // Type assertion to Omit<user, 'password'>
-    }
-
-    return user; // Return the full user with password
-  }
-
-  async findByEmail(email: string) {
-    const user = await prisma.user.findUniqueOrThrow({
-      where: {
-        email,
-        isDeleted: false,
-      },
-      select: {
-        id: true,
-        password: true,
-      },
-    });
-
-    return user;
+    const { password: _password, cargos, ...rest } = user;
+    return {
+      ...rest,
+      cargos: cargos?.split(",").filter(Boolean) ?? [],
+    };
   }
 
   async findAll() {
@@ -69,40 +40,83 @@ export class UserModel {
       where: {
         isDeleted: false,
       },
-    });
-
-    return users;
-  }
-
-  async update(data: z.infer<typeof updateUserRequestScheam>) {
-    const user = await prisma.user.update({
-      data,
-      where: {
-        id: data.id as string,
+      include: {
+        center: {
+          select: {
+            id: true,
+            name: true,
+            region: true,
+          },
+        },
       },
     });
-    return user;
+
+    return users.map(({ password: _password, cargos, ...rest }) => ({
+      ...rest,
+      cargos: cargos?.split(",").filter(Boolean) ?? [],
+    }));
   }
 
-  async exclude(id: string, soft = false) {
-    if (soft) {
-      const user = await prisma.user.update({
-        data: {
-          deletedAt: new Date(),
-          isDeleted: true,
-        },
-        where: {
-          id,
-        },
-      });
-      return user;
+  // Upsert de núcleo (Center) por nome (case-insensitive). Grava/atualiza a
+  // região (string). Retorna o id.
+  async upsertCenterByName(
+    name: string,
+    region: string | null,
+  ): Promise<string> {
+    const existing = await prisma.center.findFirst({
+      where: { name: { equals: name, mode: "insensitive" } },
+      select: { id: true, region: true },
+    });
+
+    if (existing) {
+      if (region && existing.region !== region) {
+        await prisma.center.update({
+          where: { id: existing.id },
+          data: { region },
+        });
+      }
+      return existing.id;
     }
 
-    const user = await prisma.user.delete({
-      where: {
-        id,
-      },
+    const created = await prisma.center.create({
+      data: { name, region: region ?? "" },
+      select: { id: true },
     });
-    return user;
+    return created.id;
+  }
+
+  // Provisiona/atualiza o usuário a partir do Cognito. Cognito é a fonte de
+  // verdade — sem senha local.
+  async syncFromCognito(params: {
+    data: CognitoUserData;
+    centerId: string | null;
+    bypass: boolean;
+  }): Promise<{ id: string }> {
+    const { data, centerId, bypass } = params;
+
+    const centerConnect = centerId
+      ? { center: { connect: { id: centerId } } }
+      : {};
+
+    const base = {
+      name: data.nome,
+      hierarchy: data.grau,
+      cargos: data.cargos,
+      cargoNome: data.cargoNome,
+      cargoCodigo: data.cargoCodigo,
+      bypass,
+      ...centerConnect,
+    };
+
+    return prisma.user.upsert({
+      where: { email: data.email },
+      create: {
+        email: data.email,
+        password: null,
+        ...base,
+      },
+      update: base,
+      select: { id: true },
+    });
   }
 }
