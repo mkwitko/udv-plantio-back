@@ -38,10 +38,12 @@ vi .env            # fill everything. PORT=3333 is required.
 ## 3. Cloudflare Tunnel (one-time)
 
 ```bash
-# Install cloudflared on the VPS
-curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+# Install cloudflared on the VPS. This host is ARM64 (Oracle Ampere, `uname -m`
+# = aarch64) so grab the arm64 binary — the amd64 one gives "Exec format error".
+# sudo on curl itself: the -o redirect runs as your user, not root.
+sudo curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64 \
   -o /usr/local/bin/cloudflared
-chmod +x /usr/local/bin/cloudflared
+sudo chmod +x /usr/local/bin/cloudflared
 
 # Login (opens a browser URL — pick the lexlaboral.com.br zone)
 cloudflared tunnel login
