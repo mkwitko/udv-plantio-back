@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { authenticationMiddleware } from "@/middlewares/authentication-middleware";
-import { centerResponse } from "./create-center";
+import { centerResponse } from "./center-response";
 import { findCenterByIdService } from "../../services/center/find-center-by-id-service";
 
 export async function findCenterById(app: FastifyInstance) {

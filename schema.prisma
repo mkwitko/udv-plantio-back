@@ -11,7 +11,7 @@ model User {
   id           String    @id @default(cuid())
   name         String
   cpf          String?   @unique
-  password     String
+  password     String?   // Cognito é a fonte de verdade das credenciais
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   deletedAt    DateTime?
@@ -20,7 +20,11 @@ model User {
   avatarUrl    String?
   email        String?   @unique
   phone        String?
-  hierarchy    String?
+  hierarchy    String?   // custom:grau (ex.: QM, CI)
+  cargos       String?   // custom:cargos — cru, separado por vírgula
+  cargoNome    String?   // custom:cargo_nome
+  cargoCodigo  String?   // custom:cargo_codigo
+  bypass       Boolean   @default(false)
   isActive     Boolean   @default(true)
   isVerified   Boolean   @default(false)
   isAdmin      Boolean   @default(false)

@@ -4,7 +4,7 @@ import z from "zod";
 import { findUserByIdService } from "../../services/user/find-user-by-id-service";
 import { clearAuth } from "../../services/authentication/clear-auth-service";
 import { authenticationMiddleware } from "@/middlewares/authentication-middleware";
-import { userResponse } from "./create-user";
+import { userResponse } from "./user-response";
 
 export async function findMe(app: FastifyInstance) {
   app

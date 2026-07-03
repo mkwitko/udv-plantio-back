@@ -3,7 +3,7 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { authenticationMiddleware } from "@/middlewares/authentication-middleware";
 import { findUsersService } from "../../services/user/find-users-service";
-import { userResponse } from "./create-user";
+import { userResponse } from "./user-response";
 
 export async function findUsers(app: FastifyInstance) {
   app
