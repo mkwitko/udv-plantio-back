@@ -10,7 +10,6 @@ echo " UDV Plantio Production Deploy"
 echo "=========================================="
 
 echo "==> Pulling latest code..."
-# 
 
 git pull origin main
 
