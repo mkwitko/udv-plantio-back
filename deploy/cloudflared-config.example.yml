@@ -1,0 +1,15 @@
+# Cloudflare Tunnel config — copy to /etc/cloudflared/config.yml on the VPS.
+# Replace <TUNNEL_ID> and the credentials path with the values printed by
+# `cloudflared tunnel create udv-plantio`.
+
+tunnel: <TUNNEL_ID>
+credentials-file: /root/.cloudflared/<TUNNEL_ID>.json
+
+ingress:
+  # This server (Fastify on port 3333). WebSocket works over the tunnel
+  # automatically — no extra upgrade config needed.
+  - hostname: plantio-api.lexlaboral.com
+    service: http://localhost:3333
+
+  # Required catch-all: everything else returns 404.
+  - service: http_status:404

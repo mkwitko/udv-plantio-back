@@ -11,15 +11,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '22.3.0'  # Changed to 18 as Node 22.3.0 isn't stable yet
+          node-version: '22'
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn
+        run: yarn install --frozen-lockfile
 
       - name: Build project
         run: yarn build
@@ -44,6 +45,5 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             npx prisma generate
-            pm2 flush 3
-            pm2 restart 3
-            
+            pm2 startOrReload ecosystem.config.js
+            pm2 save
