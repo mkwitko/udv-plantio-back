@@ -20,8 +20,8 @@ nvm install 22 && nvm use 22
 npm i -g pm2
 
 # App dir + env
-mkdir -p /root/projects/udv-plantio-back
-cd /root/projects/udv-plantio-back
+mkdir -p /opt/udv-plantio-back
+cd /opt/udv-plantio-back
 # create .env here (see .env-example). IMPORTANT: PORT=3333
 ```
 
@@ -31,7 +31,7 @@ across deploys). Set `PORT=3333` so it does not collide with the port-3000 app.
 DB schema: no migrations dir exists, so schema changes are applied manually:
 
 ```bash
-cd /root/projects/udv-plantio-back && npx prisma db push
+cd /opt/udv-plantio-back && npx prisma db push
 ```
 
 ## 3. First deploy
@@ -62,7 +62,7 @@ cloudflared tunnel login
 cloudflared tunnel create udv-plantio
 
 # Config: copy the example and fill in TUNNEL_ID
-cp /root/projects/udv-plantio-back/deploy/cloudflared-config.example.yml /etc/cloudflared/config.yml
+cp /opt/udv-plantio-back/deploy/cloudflared-config.example.yml /etc/cloudflared/config.yml
 #   edit /etc/cloudflared/config.yml — set tunnel + credentials-file
 
 # DNS route: creates the CNAME plantio-api → tunnel, proxied
