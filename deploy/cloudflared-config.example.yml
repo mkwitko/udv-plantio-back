@@ -6,9 +6,9 @@ tunnel: <TUNNEL_ID>
 credentials-file: /root/.cloudflared/<TUNNEL_ID>.json
 
 ingress:
-  # This server (Fastify on port 3333). WebSocket works over the tunnel
-  # automatically — no extra upgrade config needed.
-  - hostname: plantio-api.lexlaboral.com
+  # Plantio backend runs in Docker, bound to 127.0.0.1:3333 on the host.
+  # WebSocket works over the tunnel automatically — no extra upgrade config.
+  - hostname: plantio-api.lexlaboral.com.br
     service: http://localhost:3333
 
   # Required catch-all: everything else returns 404.
