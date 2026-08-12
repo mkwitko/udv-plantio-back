@@ -1,23 +1,31 @@
+# syntax=docker/dockerfile:1
+
+# ============================================================
+# Build
+# ============================================================
 FROM node:22-slim AS builder
 
-# Skip Chromium download — puppeteer is a dependency but not used at runtime.
-ENV PUPPETEER_SKIP_DOWNLOAD=true
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV NODE_ENV=development \
+    PUPPETEER_SKIP_DOWNLOAD=true \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  python3 \
-  make \
-  g++ \
-  openssl && \
-  rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        python3 \
+        make \
+        g++ \
+        openssl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile \
+    && rm -rf /usr/local/share/.cache \
+    && yarn cache clean
 
-COPY schema.prisma ./schema.prisma
+COPY schema.prisma ./
 
 RUN npx prisma generate
 
@@ -25,45 +33,53 @@ COPY . .
 
 RUN yarn build
 
-# ---------------------------------------
 
+# ============================================================
+# Production
+# ============================================================
 FROM node:22-slim AS runner
 
-ENV PUPPETEER_SKIP_DOWNLOAD=true
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV NODE_ENV=production \
+    PUPPETEER_SKIP_DOWNLOAD=true \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /app
 
-ENV NODE_ENV=production
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        openssl \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  openssl && \
-  rm -rf /var/lib/apt/lists/*
+RUN groupadd --gid 1001 appgroup \
+    && useradd \
+        --uid 1001 \
+        --gid appgroup \
+        --shell /bin/bash \
+        --create-home appuser
 
-COPY package.json yarn.lock ./
+COPY --chown=appuser:appgroup package.json yarn.lock ./
 
-RUN yarn install --frozen-lockfile --production=true
+RUN yarn install --frozen-lockfile --production=true \
+    && rm -rf /usr/local/share/.cache \
+    && yarn cache clean
 
-COPY schema.prisma ./schema.prisma
+COPY --chown=appuser:appgroup schema.prisma ./
 
 RUN npx prisma generate
 
-COPY --from=builder /app/dist ./dist
+COPY --chown=appuser:appgroup --from=builder /app/dist ./dist
 
-COPY ecosystem.config.js ./
-
-RUN groupadd --gid 1001 appgroup && \
-    useradd --uid 1001 \
-    --gid appgroup \
-    --shell /bin/bash \
-    --create-home appuser && \
-    chown -R appuser:appgroup /app
+COPY --chown=appuser:appgroup ecosystem.config.js ./
 
 USER appuser
 
 EXPOSE 3333
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-CMD node -e "fetch('http://localhost:3333/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
+HEALTHCHECK \
+    --interval=30s \
+    --timeout=5s \
+    --start-period=15s \
+    --retries=3 \
+    CMD node -e "fetch('http://localhost:3333/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
 
 CMD ["npx", "pm2-runtime", "start", "ecosystem.config.js"]
