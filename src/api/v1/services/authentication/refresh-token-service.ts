@@ -4,7 +4,9 @@ import type { FastifyJWT } from "@fastify/jwt";
 import { findUserByIdService } from "../user/find-user-by-id-service";
 
 export async function refreshTokenService(refreshToken: string) {
-  const decode = app.jwt.decode<FastifyJWT["payload"]>(refreshToken);
+  // verify (não decode): o token do body precisa ter assinatura válida,
+  // senão qualquer um forjaria um userId e receberia tokens de outra conta.
+  const decode = await app.jwt.verify<FastifyJWT["payload"]>(refreshToken);
 
   if (!decode || !decode.userId) {
     throw new UnauthorizedError("Token inválido");

@@ -9,8 +9,11 @@ export const authenticationMiddleware = fastifyPlugin(
   async (app: FastifyInstance) => {
     app.addHook("preHandler", async (request, reply) => {
       try {
-        // Extract the access token from cookies
-        const accessToken = request.cookies.accessToken;
+        // App mobile envia Bearer (tokens no SecureStore); web usa cookie.
+        const header = request.headers.authorization;
+        const accessToken = header?.startsWith("Bearer ")
+          ? header.slice(7)
+          : request.cookies.accessToken;
         const refreshToken = request.cookies.refreshToken;
 
         // If there's no access token, throw an UnauthorizedError

@@ -3,12 +3,10 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { refreshTokenService } from "../../services/authentication/refresh-token-service";
-import { authenticationMiddleware } from "@/middlewares/authentication-middleware";
 
 export async function refreshToken(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
-    .register(authenticationMiddleware)
     .post(
       "/authentication/refresh",
       {
