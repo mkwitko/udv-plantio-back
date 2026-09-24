@@ -21,6 +21,18 @@ const include = {
 
 export class PlantsModel {
   async create(data: z.infer<typeof createPlantRequestSchema>) {
+    // Idempotente: o app reenvia o create quando a resposta se perde (sinal
+    // fraco). O upsert pelo id local evita duplicar e aplica o payload mais
+    // recente.
+    if (data.offlinePreviousId) {
+      return prisma.plants.upsert({
+        where: { offlinePreviousId: data.offlinePreviousId },
+        create: data,
+        update: data,
+        include,
+      });
+    }
+
     const plant = await prisma.plants.create({
       data,
       include,

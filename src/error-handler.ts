@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import { BadRequestError } from "./errors/bad-request-error";
 import { ConflictError } from "./errors/conflict-error";
 import { ForbiddenError } from "./errors/forbidden-error";
+import { NotFoundError } from "./errors/not-found-error";
 import { PrismaError } from "./errors/prisma-error";
 import { UnauthorizedError } from "./errors/unauthorized-error";
 import { clearAuth } from "./api/v1/services/authentication/clear-auth-service";
@@ -32,6 +33,12 @@ export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
 
   if (error instanceof ForbiddenError) {
     return reply.status(403).send({
+      message: error.message,
+    });
+  }
+
+  if (error instanceof NotFoundError) {
+    return reply.status(404).send({
       message: error.message,
     });
   }

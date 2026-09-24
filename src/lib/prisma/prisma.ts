@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/errors/not-found-error";
 import { handlePrismaError } from "@/errors/prisma/prisma-error-handler";
 import { PrismaClient } from "@prisma/client";
 
@@ -17,6 +18,9 @@ const extendedPrismaClient = prismaClient.$extends({
           return await query(args);
         } catch (error: any) {
           const errorMessage = handlePrismaError(error);
+          // Registro inexistente (update/delete/findUniqueOrThrow): 404 para o
+          // app distinguir de erro real.
+          if (error?.code === "P2025") throw new NotFoundError(errorMessage);
           throw new Error(errorMessage);
         }
       },
