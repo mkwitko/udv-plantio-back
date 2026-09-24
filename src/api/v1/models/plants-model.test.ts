@@ -6,6 +6,8 @@ const { upsert, create } = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/prisma/prisma", () => ({ prisma: { plants: { upsert, create } } }));
 
+import { ConflictError } from "@/errors/conflict-error";
+import { NotFoundError } from "@/errors/not-found-error";
 import { PlantsModel } from "./plants-model";
 
 const base = {
@@ -38,5 +40,21 @@ describe("PlantsModel.create", () => {
     await new PlantsModel().create(base);
     expect(upsert).not.toHaveBeenCalled();
     expect(create).toHaveBeenCalled();
+  });
+
+  it("retries once when a concurrent resend wins the unique race", async () => {
+    upsert
+      .mockRejectedValueOnce(new ConflictError("duplicado"))
+      .mockResolvedValueOnce({ id: "p1", isDeleted: false });
+    const plant = await new PlantsModel().create({ ...base, offlinePreviousId: "local_1" });
+    expect(upsert).toHaveBeenCalledTimes(2);
+    expect(plant.id).toBe("p1");
+  });
+
+  it("does not revive a plant deleted on the server", async () => {
+    upsert.mockResolvedValue({ id: "p1", isDeleted: true });
+    await expect(
+      new PlantsModel().create({ ...base, offlinePreviousId: "local_1" })
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 });

@@ -33,6 +33,7 @@ export async function authenticateUser(app: FastifyInstance) {
       const accessToken = app.jwt.sign(
         {
           userId: user.id,
+          typ: "access",
         },
         { expiresIn: "1d" }
       );
@@ -40,6 +41,7 @@ export async function authenticateUser(app: FastifyInstance) {
       const refreshToken = app.jwt.sign(
         {
           userId: user.id,
+          typ: "refresh",
         },
         { expiresIn: "30d" }
       );

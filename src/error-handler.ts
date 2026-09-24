@@ -1,5 +1,5 @@
 // import { isAxiosError } from 'axios'
-import type { FastifyInstance } from "fastify";
+import type { FastifyError, FastifyInstance } from "fastify";
 import { ZodError } from "zod";
 import { BadRequestError } from "./errors/bad-request-error";
 import { ConflictError } from "./errors/conflict-error";
@@ -12,6 +12,16 @@ import { clearAuth } from "./api/v1/services/authentication/clear-auth-service";
 type FastifyErrorHandler = FastifyInstance["errorHandler"];
 
 export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
+  // Validação do schema de rota (fastify-type-provider-zod) chega aqui como
+  // erro do Fastify com `validation`, não como ZodError.
+  const { validation } = error as FastifyError;
+  if (validation) {
+    return reply.status(400).send({
+      message: "Erro de validação",
+      errors: validation,
+    });
+  }
+
   if (error instanceof ZodError) {
     return reply.status(400).send({
       message: "Erro de validação",

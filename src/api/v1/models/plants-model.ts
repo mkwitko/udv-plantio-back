@@ -1,3 +1,5 @@
+import { ConflictError } from "@/errors/conflict-error";
+import { NotFoundError } from "@/errors/not-found-error";
 import { prisma } from "@/lib/prisma/prisma";
 import type z from "zod";
 import type { createPlantRequestSchema } from "../controllers/plants/create-plants";
@@ -25,12 +27,25 @@ export class PlantsModel {
     // fraco). O upsert pelo id local evita duplicar e aplica o payload mais
     // recente.
     if (data.offlinePreviousId) {
-      return prisma.plants.upsert({
-        where: { offlinePreviousId: data.offlinePreviousId },
-        create: data,
-        update: data,
-        include,
-      });
+      const upsert = () =>
+        prisma.plants.upsert({
+          where: { offlinePreviousId: data.offlinePreviousId },
+          create: data,
+          update: data,
+          include,
+        });
+      let plant: Awaited<ReturnType<typeof upsert>>;
+      try {
+        plant = await upsert();
+      } catch (error) {
+        // Dois reenvios simultâneos: quem perde o unique tenta de novo e agora
+        // encontra a linha, caindo no update.
+        if (!(error instanceof ConflictError)) throw error;
+        plant = await upsert();
+      }
+      // Excluída no servidor (ex.: pelo painel): não ressuscita.
+      if (plant.isDeleted) throw new NotFoundError("Planta excluída no servidor.");
+      return plant;
     }
 
     const plant = await prisma.plants.create({

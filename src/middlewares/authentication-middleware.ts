@@ -1,6 +1,7 @@
 import { refreshTokenService } from "@/api/v1/services/authentication/refresh-token-service";
 import { setHttpOnlyCookie } from "@/api/v1/services/authentication/set-http-only-cookie";
 import { UnauthorizedError } from "@/errors/unauthorized-error";
+import { isTokenType } from "@/lib/token-type";
 import type { FastifyInstance } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 import { TokenExpiredError } from "jsonwebtoken";
@@ -15,7 +16,7 @@ export const authenticationMiddleware = fastifyPlugin(
       if (header?.startsWith("Bearer ")) {
         try {
           request.user = await app.jwt.verify(header.slice(7));
-          return;
+          if (isTokenType(request.user, "access")) return;
         } catch (error) {
           if (!request.cookies.accessToken && !request.cookies.refreshToken) {
             throw new UnauthorizedError("Token de acesso inválido");
@@ -40,6 +41,7 @@ export const authenticationMiddleware = fastifyPlugin(
 
         // Verify the JWT token
         request.user = await app.jwt.verify(accessToken);
+        if (!isTokenType(request.user, "access")) throw new UnauthorizedError();
       } catch (error) {
         // If the token is expired, try to refresh it
         if (error instanceof TokenExpiredError) {
