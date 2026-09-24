@@ -8,12 +8,23 @@ import { TokenExpiredError } from "jsonwebtoken";
 export const authenticationMiddleware = fastifyPlugin(
   async (app: FastifyInstance) => {
     app.addHook("preHandler", async (request, reply) => {
+      // App mobile envia Bearer (tokens no SecureStore). Se o Bearer falhar,
+      // cai no cookie: instalações antigas renovavam só o cookie e têm
+      // tokens velhos no SecureStore.
+      const header = request.headers.authorization;
+      if (header?.startsWith("Bearer ")) {
+        try {
+          request.user = await app.jwt.verify(header.slice(7));
+          return;
+        } catch (error) {
+          if (!request.cookies.accessToken && !request.cookies.refreshToken) {
+            throw new UnauthorizedError("Token de acesso inválido");
+          }
+        }
+      }
+
       try {
-        // App mobile envia Bearer (tokens no SecureStore); web usa cookie.
-        const header = request.headers.authorization;
-        const accessToken = header?.startsWith("Bearer ")
-          ? header.slice(7)
-          : request.cookies.accessToken;
+        const accessToken = request.cookies.accessToken;
         const refreshToken = request.cookies.refreshToken;
 
         // If there's no access token, throw an UnauthorizedError

@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import z from 'zod'
+import { authenticationMiddleware } from '@/middlewares/authentication-middleware'
 import { createPlantsService } from '../../services/plants/create-plants-service'
 
 export const plantResponse = z.object({
@@ -50,25 +51,28 @@ export const plantResponse = z.object({
 })
 
 export async function createPlants(app: FastifyInstance) {
-  app.withTypeProvider<ZodTypeProvider>().post(
-    '/plants/create',
-    {
-      schema: {
-        tags: ['Plants'],
-        summary: 'Create Plants',
-        description: 'Create a new Plants',
-        operationId: 'createPlants',
-        body: createPlantRequestSchema,
-        response: {
-          201: plantResponse,
+  app
+    .withTypeProvider<ZodTypeProvider>()
+    .register(authenticationMiddleware)
+    .post(
+      '/plants/create',
+      {
+        schema: {
+          tags: ['Plants'],
+          summary: 'Create Plants',
+          description: 'Create a new Plants',
+          operationId: 'createPlants',
+          body: createPlantRequestSchema,
+          response: {
+            201: plantResponse,
+          },
         },
       },
-    },
-    async (request, response) => {
-      const { plants } = await createPlantsService(request.body)
-      return response.status(201).send(plants)
-    },
-  )
+      async (request, response) => {
+        const { plants } = await createPlantsService(request.body)
+        return response.status(201).send(plants)
+      },
+    )
 }
 
 export const createPlantRequestSchema = z.object({
