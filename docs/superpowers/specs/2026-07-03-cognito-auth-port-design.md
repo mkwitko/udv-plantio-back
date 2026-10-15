@@ -16,7 +16,7 @@ emite o nosso próprio JWT (fluxo atual, inalterado). Usuário e núcleo (Center
 - **Escopo enxuto**: só gate de acesso + provisioning. NÃO portar tabela de permissões nem filtro de escopo (plantio não tem esses models; `Center.region` é String).
 - **Mesmo pool Cognito do sus**: `us-east-1_QCJtSIWeq`, client `7lcqn8l4s2uth5qh2kmif2bap3`.
 - **Regra de acesso** (mais restrita que o sus): entra só quem for `grau === "QM"` **OU** tiver o cargo `MONITOR(A) DO PLANTIO LOCAL` (código 56) **OU** bypass de email. Senão → 403 "Sem acesso ao aplicativo".
-- **Bypass**: `BYPASS_EMAILS` no `.env` = `mauriciokwt@gmail.com`. Bypass = acesso garantido.
+- **Bypass**: `BYPASS_EMAILS` no `.env` = `owner@example.com`. Bypass = acesso garantido.
 - **Remover login local (bcrypt)** do fluxo de auth: `password` vira opcional, sem `compare`. Cognito valida. Usuário que existe no Cognito mas não no DB é auto-provisionado.
 - **Provisionar do token a cada login**: Center (upsert por nome, `region` = regiao do token) e User (upsert por email).
 - **`hierarchy`** (já existe em `User`) é usado como `grau`.
@@ -61,7 +61,7 @@ front → POST /sign/in {email, password}
    COGNITO_REGION=us-east-1
    COGNITO_USER_POOL_ID=us-east-1_QCJtSIWeq
    COGNITO_USER_POOL_CLIENT_ID=7lcqn8l4s2uth5qh2kmif2bap3
-   BYPASS_EMAILS=mauriciokwt@gmail.com
+   BYPASS_EMAILS=owner@example.com
    # mock (só dev)
    MOCK_ENABLED=false
    MOCK_BYPASS=true
