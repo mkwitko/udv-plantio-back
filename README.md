@@ -2,7 +2,7 @@
 
 REST API that stores geolocated plant records (position, photo, care dates) for a mobile field app and a web panel, with centre-scoped access.
 
-Status: deployed for a private organisation by its owner; not an open product. Single developer, no load or uptime figures are claimed.
+Status: built for a private organisation, with a documented Docker deploy pipeline (`deploy/DEPLOY.md`); not an open product. No load or uptime figures are claimed.
 
 ## What it does
 
