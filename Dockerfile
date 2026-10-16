@@ -21,7 +21,7 @@ WORKDIR /app
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --frozen-lockfile \
+RUN yarn install --frozen-lockfile --network-timeout 600000 \
     && rm -rf /usr/local/share/.cache \
     && yarn cache clean
 
@@ -59,7 +59,7 @@ RUN groupadd --gid 1001 appgroup \
 
 COPY --chown=appuser:appgroup package.json yarn.lock ./
 
-RUN yarn install --frozen-lockfile --production=true \
+RUN yarn install --frozen-lockfile --network-timeout 600000 --production=true \
     && rm -rf /usr/local/share/.cache \
     && yarn cache clean
 
