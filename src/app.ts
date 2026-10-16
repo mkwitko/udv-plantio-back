@@ -56,7 +56,7 @@ app.register(fastifyCors, {
 app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: "Udv Plantio",
+      title: "Planting Geotracker API",
       version: "1.0.0",
     },
     components: {
